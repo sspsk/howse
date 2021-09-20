@@ -1,6 +1,9 @@
 from flask import Flask,redirect,url_for
-from arducom import arduwrite
+import serial
+import atexit
+#from arducom import arduwrite
 
+ser = serial.Serial('COM9',9600)
 app = Flask(__name__)
 
 @app.route('/')
@@ -9,5 +12,11 @@ def index():
 
 @app.route('/toggle')
 def toggle():
-	arduwrite('/dev/rfcomm0',b'b')
+	ser.write(b'b')
 	return redirect(url_for('index'))
+
+def onExit():
+        ser.close()
+        print("serial conn closed, exiting app...")
+
+atexit.register(onExit)
